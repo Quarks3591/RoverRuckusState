@@ -44,24 +44,23 @@ public class State_Auto extends LinearOpMode {
             if (gamepad1.y || gamepad2.y) side = "Right";
             telemetry.addData("Side {Left (A), Right (Y)}", side);
 
-            /*
-            if(gamepad1.left_stick_button || gamepad2.left_stick_button) side = "Center";
-            if (gamepad1.right_stick_button || gamepad2.right_stick_button) side = "Far";
-            telemetry.addData("Target {Center (Left Stick), Far (Right Stick)}", target);
-            */
-
             telemetry.update();
         }
         waitForStart();
 
         //lower to the ground and let go of bracket
         chassis.extendLift();
+        sleep(1000);
+        chassis.stopLift();
+        sleep(100);
         chassis.strafeLeftDistance(1.0, 1000);
         chassis.retractLift();
+        sleep(1000);
+        chassis.stopLift();
+        sleep(100);
 
-        //move to minerals and scan minerals
-        chassis.driveForwardDistance(1.0, 5000);
-        chassis.strafeLeftDistance(1.0, 1000);
+        //scan minerals using phone
+
 
         //knock gold mineral
         boolean left = false;

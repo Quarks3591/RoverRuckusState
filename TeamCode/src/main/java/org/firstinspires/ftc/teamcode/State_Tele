@@ -116,5 +116,6 @@ public class State_Tele extends OpMode {
         if (gamepad2.b){
             depositor.setPosition(0.0);
         }
+
     }
 }

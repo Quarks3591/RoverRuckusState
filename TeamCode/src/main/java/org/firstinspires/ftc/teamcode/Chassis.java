@@ -14,12 +14,15 @@ import static java.lang.Double.isNaN;
 public class Chassis {
 
     //create drive train objects
-    DcMotor frontLeftDrive;
-    DcMotor backLeftDrive;
-    DcMotor frontRightDrive;
-    DcMotor backRightDrive;
+    DcMotor FrontLeft;
+    DcMotor BackLeft;
+    DcMotor FrontRight;
+    DcMotor BackRight;
 
-    DcMotor lift;
+    DcMotor HangSpool;
+    DcMotor HangLift;
+    DcMotor BoxLift;
+    DcMotor Collector;
 
     Servo depositor;
     Servo markerHolder;
@@ -48,44 +51,56 @@ public class Chassis {
         hwm = inhwm;
 
         //connect to hardware
-        frontLeftDrive = hwm.get(DcMotor.class, "front_left_drive");
-        backLeftDrive = hwm.get(DcMotor.class, "back_left_drive");
-        frontRightDrive = hwm.get(DcMotor.class, "front_right_drive");
-        backRightDrive = hwm.get(DcMotor.class, "back_right_drive");
-        lift = hwm.get(DcMotor.class, "lift");
+        FrontLeft = hwm.get(DcMotor.class, "front_left_drive");
+        BackLeft = hwm.get(DcMotor.class, "back_left_drive");
+        FrontRight = hwm.get(DcMotor.class, "front_right_drive");
+        BackRight = hwm.get(DcMotor.class, "back_right_drive");
+
+        HangLift = hwm.get(DcMotor.class, "hang_lift");
+        HangSpool = hwm.get(DcMotor.class, "hang_spool");
+        BoxLift = hwm.get(DcMotor.class, "box_lift");
+        Collector = hwm.get(DcMotor.class, "collector");
 
         depositor = hwm.get(Servo.class, "depositor");
         markerHolder = hwm.get(Servo.class, "markerHolder");
 
-        distance = hwm.get(DistanceSensor.class, "distance");
-
-        color = hwm.get(ColorSensor.class, "color");
-
         //set drivetrain direction
-        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
-        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        FrontLeft.setDirection(DcMotor.Direction.FORWARD);
+        BackLeft.setDirection(DcMotor.Direction.FORWARD);
+        FrontRight.setDirection(DcMotor.Direction.REVERSE);
+        BackRight.setDirection(DcMotor.Direction.REVERSE);
 
-        //set lift direction
-        lift.setDirection(DcMotor.Direction.FORWARD);
+        //set lifts directions
+        HangLift.setDirection(DcMotor.Direction.FORWARD);
+        HangSpool.setDirection(DcMotor.Direction.FORWARD);
+        BoxLift.setDirection(DcMotor.Direction.FORWARD);
+
+        //set collector direction
+        Collector.setDirection((DcMotor.Direction.FORWARD));
 
         //set init power
-        frontLeftDrive.setPower(0);
-        backLeftDrive.setPower(0);
-        frontRightDrive.setPower(0);
-        backRightDrive.setPower(0);
-        lift.setPower(0);
+        FrontLeft.setPower(0);
+        BackLeft.setPower(0);
+        FrontRight.setPower(0);
+        BackRight.setPower(0);
+        HangLift.setPower(0);
+        HangSpool.setPower(0);
+        BoxLift.setPower(0);
+        Collector.setPower(0);
 
         //set init mode
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        FrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        HangLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        HangSpool.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BoxLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Collector.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //set init position
         depositor.setPosition(INIT);
+        markerHolder.setPosition(INIT);
 
         //setup vision if desired
         if(vision) {
@@ -110,26 +125,26 @@ public class Chassis {
     }
     //power-Drive Methods
     public void driveForward(double power) {
-        frontLeftDrive.setPower(power);
-        backLeftDrive.setPower(power);
-        frontRightDrive.setPower(power);
-        backRightDrive.setPower(power);
+        FrontLeft.setPower(power);
+        BackLeft.setPower(power);
+        FrontRight.setPower(power);
+        BackRight.setPower(power);
     }
     public void driveBackward(double power) { driveForward(-power);}
     public void turnLeft(double power) {
-        frontLeftDrive.setPower(-power);
-        backLeftDrive.setPower(-power);
-        frontRightDrive.setPower(power);
-        backRightDrive.setPower(power);
+        FrontLeft.setPower(-power);
+        BackLeft.setPower(-power);
+        FrontRight.setPower(power);
+        BackRight.setPower(power);
     }
     public void turnRight(double power) {
         turnLeft(-power);
     }
     public void strafeLeft(double power) {
-        frontLeftDrive.setPower(power);
-        backLeftDrive.setPower(-power);
-        frontRightDrive.setPower(-power);
-        backRightDrive.setPower(power);
+        FrontLeft.setPower(power);
+        BackLeft.setPower(-power);
+        FrontRight.setPower(-power);
+        BackRight.setPower(power);
     }
     public void strafeRight(double power) { strafeLeft(-power);}
     //drive Forward/backward to given position
@@ -140,26 +155,26 @@ public class Chassis {
     }
     //set positions for all motors for drivetrain
     public void setTargetPosition(int position) {
-        frontLeftDrive.setTargetPosition(position);
-        backLeftDrive.setTargetPosition(position);
-        frontRightDrive.setTargetPosition(position);
-        backRightDrive.setTargetPosition(position);
+        FrontLeft.setTargetPosition(position);
+        BackLeft.setTargetPosition(position);
+        FrontRight.setTargetPosition(position);
+        BackRight.setTargetPosition(position);
     }
     public void setTargetTurn(int position) {
-        frontLeftDrive.setTargetPosition(position);
-        backLeftDrive.setTargetPosition(position);
-        frontRightDrive.setTargetPosition(-position);
-        backRightDrive.setTargetPosition(-position);
+        FrontLeft.setTargetPosition(position);
+        BackLeft.setTargetPosition(position);
+        FrontRight.setTargetPosition(-position);
+        BackRight.setTargetPosition(-position);
     }
     public void setTargetStrafe(int position) {
-        frontLeftDrive.setTargetPosition(-position);
-        backLeftDrive.setTargetPosition(position);
-        frontRightDrive.setTargetPosition(position);
-        backRightDrive.setTargetPosition(-position);
+        FrontLeft.setTargetPosition(-position);
+        BackLeft.setTargetPosition(position);
+        FrontRight.setTargetPosition(position);
+        BackRight.setTargetPosition(-position);
     }
     //check if motors are busy
     public boolean motorsAreBusy() {
-        return (frontLeftDrive.isBusy() || backLeftDrive.isBusy() || frontRightDrive.isBusy() || backRightDrive.isBusy());
+        return (FrontLeft.isBusy() || BackLeft.isBusy() || FrontRight.isBusy() || BackRight.isBusy());
     }
     //turn to given position
     public void turnToPosition(int position) {
@@ -173,16 +188,16 @@ public class Chassis {
         runToPosition();
     }
     public void stopAndReset() {
-        frontLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        frontRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        BackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        FrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        BackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
     public void runToPosition() {
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        FrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        FrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
     public void execute() {
         driveForward(0.5);
@@ -197,10 +212,16 @@ public class Chassis {
     }
     //lift system
     public void extendLift() {
-        lift.setPower(1.0);
+        HangLift.setPower(1.0);
+        HangSpool.setPower(1.0);
     }
     public void retractLift() {
-        lift.setPower(-1.0);
+        HangLift.setPower(-1.0);
+        HangSpool.setPower(-1.0);
+    }
+    public void stopLift() {
+        HangLift.setPower(0.0);
+        HangSpool.setPower(0.0);
     }
 
     //drive a distance method
@@ -209,30 +230,30 @@ public class Chassis {
         stopAndReset();
 
         //Set target position
-        frontLeftDrive.setTargetPosition(distance);
-        backLeftDrive.setTargetPosition(distance);
-        frontRightDrive.setTargetPosition(distance);
-        backRightDrive.setTargetPosition(distance);
+        FrontLeft.setTargetPosition(distance);
+        BackLeft.setTargetPosition(distance);
+        FrontRight.setTargetPosition(distance);
+        BackRight.setTargetPosition(distance);
 
         //Set to RUN_TO_POSITION mode
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        FrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        FrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         //Set drive power
         driveForward(power);
 
-        while(frontLeftDrive.isBusy() && backLeftDrive.isBusy() && frontRightDrive.isBusy() && backRightDrive.isBusy()){
+        while(FrontLeft.isBusy() && BackLeft.isBusy() && FrontRight.isBusy() && BackRight.isBusy()){
             //wait until target position is reached
         }
 
         //stop and change modes back to normal
         stop();
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void strafeLeftDistance(double power, int distance) {
@@ -240,30 +261,30 @@ public class Chassis {
         stopAndReset();
 
         //Set target position
-        frontLeftDrive.setTargetPosition(distance);
-        backLeftDrive.setTargetPosition(-distance);
-        frontRightDrive.setTargetPosition(-distance);
-        backRightDrive.setTargetPosition(distance);
+        FrontLeft.setTargetPosition(distance);
+        BackLeft.setTargetPosition(-distance);
+        FrontRight.setTargetPosition(-distance);
+        BackRight.setTargetPosition(distance);
 
         //Set to RUN_TO_POSITION mode
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        FrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        FrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         //Set drive power
         driveForward(power);
 
-        while(frontLeftDrive.isBusy() && backLeftDrive.isBusy() && frontRightDrive.isBusy() && backRightDrive.isBusy()){
+        while(FrontLeft.isBusy() && BackLeft.isBusy() && FrontRight.isBusy() && BackRight.isBusy()){
             //wait until target position is reached
         }
 
         //stop and change modes back to normal
         stop();
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void strafeRightDistance(double power, int distance){
@@ -271,30 +292,30 @@ public class Chassis {
         stopAndReset();
 
         //Set target position
-        frontLeftDrive.setTargetPosition(-distance);
-        backLeftDrive.setTargetPosition(distance);
-        frontRightDrive.setTargetPosition(distance);
-        backRightDrive.setTargetPosition(-distance);
+        FrontLeft.setTargetPosition(-distance);
+        BackLeft.setTargetPosition(distance);
+        FrontRight.setTargetPosition(distance);
+        BackRight.setTargetPosition(-distance);
 
         //Set to RUN_TO_POSITION mode
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        FrontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BackLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        FrontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        BackRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         //Set drive power
         driveForward(power);
 
-        while(frontLeftDrive.isBusy() && backLeftDrive.isBusy() && frontRightDrive.isBusy() && backRightDrive.isBusy()){
+        while(FrontLeft.isBusy() && BackLeft.isBusy() && FrontRight.isBusy() && BackRight.isBusy()){
             //wait until target position is reached
         }
 
         //stop and change modes back to normal
         stop();
-        frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        BackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     public void findColor (){
 
